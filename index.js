@@ -19,10 +19,14 @@ app.use(express.json())
 app.get('/', (req,res) => res.send({info: 'Journal - API'}))
 app.get('/categories', (req,res) => res.status(201).send(categories))
 app.get('/entries', (req,res) => res.status(200).send(entries))
-app.get('/entries/:id', (req,res) =>{
-    res.sendStatus(204)
-
-} )
+app.get('/entries/:id', (req, res) => {
+    const entry = entries[req.params.id - 1]
+    if (entry) {
+        res.send(entry)
+    } else {
+        res.status(404).send({ error: 'Entry not found' })
+    }
+})
 
 
 app.post('/entries', (req,res) =>{
