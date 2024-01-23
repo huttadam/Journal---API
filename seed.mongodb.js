@@ -13,6 +13,15 @@
 use('Journal');
 
 // const categories = db.getCollection('categories')
+// categories.drop()
+// categories.inseryMany()
+
+const entries = db.getCollection('entries')
+entries.drop()
+entries.insertMany([
+    {category: 'Food', content: 'Pizza is yummy'},
+    {category: 'Coding', content: 'Coding is fun'},
+    {category: 'Gaming', content: 'Skyrim is for Nords'}])
 
 db.categories.drop()
 db.categories.insertMany([
