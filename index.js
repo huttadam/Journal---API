@@ -1,28 +1,7 @@
 import express from 'express';
-import mongoose from 'mongoose';
-import dotenv from 'dotenv';
+import { EntryModel, CategoriesModel } from './db.js';
 
-dotenv.config()
-
-const categories = ['Food', 'Coding', 'Gaming', 'Other']
-
-// const entries = [
-//     {category: 'Food', content: 'Pizza is yummy'},
-//     {category: 'Coding', content: 'Coding is fun'},
-//     {category: 'Gaming', content: 'Skyrim is for Nords'}]
-
-
-mongoose.connect(process.env.DB_URI)
-    .then(m => console.log(m.connection.readyState === 1 ? 'MongoDB connected!': 'MongoDB failed to connect!'))
-    .catch(err => console.error(err))
-
-
-const entriesSchema = new mongoose.Schema({
-    category: { type: String, required: true },
-    content: { type: String, required: true }
-})
-
-const EntryModel = mongoose.model('Entry', entriesSchema)
+// const categories = ['Food', 'Coding', 'Gaming', 'Other']
 
 const app = express()
 
@@ -30,14 +9,12 @@ app.use(express.json())
 
 app.get('/', (req, res) => res.send({ info: 'Journal API' }))
 
-app.get('/categories', (req, res) => res.send(categories))
+app.get('/categories', async (req, res) => res.send(await CategoriesModel.find({})))
 
-app.get('/entries', (req, res) => res.send(entries))
+app.get('/entries', async (req, res) => res.send(await EntryModel.find()))
 
-app.get('/entries/foo', (req, res) => res.send({ foo: 'bar' }))
-
-app.get('/entries/:id', (req, res) => {
-    const entry = entries[req.params.id - 1]
+app.get('/entries/:id', async (req, res) => {
+    const entry = await EntryModel.findOne({_id: req.params.id})
     if (entry) {
         res.send(entry)
     } else {
@@ -59,6 +36,36 @@ app.post('/entries', async (req, res) => {
     }
     catch (err) {
         res.status(400).send({ error: err.message })
+    }
+})
+
+app.put('/entries/:id', async (req, res) => {
+    try {
+        const updatedEntry = await EntryModel.findByIdAndUpdate(req.params.id,req.body, {new: true})
+        if (updatedEntry){
+        res.send(updatedEntry)}
+        else{
+            res.status(404).send({error: "Entry not Found"})
+        }
+    
+    }
+    catch (err) {
+        res.status(400).send({ error: err.message })
+    }
+})
+
+app.delete('/entries/:id', async (req, res) => {
+    try {
+        const deletedEntry = await EntryModel.findByIdAndDelete(req.params.id,req.body)
+        if (deletedEntry){
+        res.sendStatus(204)}
+        else{
+            res.status(404).send({error: "Entry not Found"})
+        }
+    
+    }
+    catch (err) {
+        res.status(500).send({ error: err.message })
     }
 })
     
