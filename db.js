@@ -1,39 +1,32 @@
-import mongoose from 'mongoose';
-import dotenv from 'dotenv';
+import mongoose from 'mongoose'
+import dotenv from 'dotenv'
 
 dotenv.config()
 
 try {
-const m = await mongoose.connect(process.env.DB_URI)
-    console.log(m.connection.readyState === 1 ? 'MongoDB connected!': 'MongoDB failed to connect!')
+    const m = await mongoose.connect(process.env.DB_URI)
+    console.log(m.connection.readyState === 1 ? 'MongoDB connected!' : 'MongoDB failed to connect')
 }
-catch(e) {
-    console.log(err)
+catch (err) {
+    console.error(err)
 }
 
-process.on('SIGINT', () => {
+const closeConnection = () => {
     console.log('Mongoose disconnecting ...')
     mongoose.disconnect()
+}
+
+const categoriesSchema = new mongoose.Schema({
+    name: { type: String, required: true }
 })
 
-const closeConnection = () =>{
-    console.log('Mongoose disconnecting ...')
-    mongoose.disconnect()
-}
+const CategoryModel = mongoose.model('Category', categoriesSchema)
 
 const entriesSchema = new mongoose.Schema({
-    category: { type: String, required: true },
+    category: { type: mongoose.ObjectId, ref: 'Category' },
     content: { type: String, required: true }
 })
 
 const EntryModel = mongoose.model('Entry', entriesSchema)
 
-
-const categoriesSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-})
-
-const CategoriesModel = mongoose.model('Category', categoriesSchema)
-
-
-export { EntryModel , CategoriesModel, closeConnection}
+export { closeConnection, EntryModel, CategoryModel }

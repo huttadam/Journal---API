@@ -1,17 +1,34 @@
-import { EntryModel, closeConnection } from "./db.js"
+import { EntryModel, closeConnection, CategoryModel } from "./db.js"
+
+const categories = [
+    {
+        "name": "Food"
+    },
+    {
+        "name": "Gaming"
+    },
+    {
+        "name": "Coding"
+    },
+    {
+        "name": "Other"
+    }
+]
+
+await CategoryModel.deleteMany()
+console.log('Deleted categories')
+const cats = await CategoryModel.insertMany(categories)
+console.log('Added categories')
 
 const entries = [
-    {category: 'Food', content: 'Pizza is yummy'},
-    {category: 'Coding', content: 'Coding is fun'},
-    {category: 'Gaming', content: 'Skyrim is for Nords'}
+    { category: cats[0]._id, content: 'Pizza is yummy!' },
+    { category: cats[2]._id, content: 'Coding is fun!' },
+    { category: cats[1]._id, content: 'Skyrim is for the Nords' }
 ]
 
 await EntryModel.deleteMany()
-console.log('Delete Entries')
-
+console.log('Deleted entries')
 await EntryModel.insertMany(entries)
-console.log('Added Entries')
-
+console.log('Added entries')
 
 closeConnection()
-// process.kill(process.pid, 'SIGINT')
