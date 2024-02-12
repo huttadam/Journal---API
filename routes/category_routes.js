@@ -43,7 +43,8 @@ router.delete('/:id', async (req, res) => {
         const deletedCategory = await CategoryModel.findByIdAndDelete(req.params.id)
         if (deletedCategory) {
             res.sendStatus(204)
-        } else {
+        } 
+        else {
             res.status(404).send({ error: 'Entry not found' })
         }
     }
@@ -53,3 +54,4 @@ router.delete('/:id', async (req, res) => {
 })
 
 export default router
+
